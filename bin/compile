@@ -100,9 +100,10 @@ if [ -n "$PROJECT" ]; then
 	echo "Project file configured in PROJECT environment variable"
 elif [ -e ${DEPLOYMENT_FILE_LOCATION} ]; then
 	PROJECT_FILE=${SRC_DIR}/$(awk -F "=" '/project/ {print $2}' ${DEPLOYMENT_FILE_LOCATION} | tr -d ' ')
-	echo "Project file configured in .deployment file"
+	echo "Project file configured in .deployment file: ${PROJECT_FILE}"
 else
-	PROJECT_FILES=$(find ${SRC_DIR}/. -maxdepth 3 -iname *.csproj)
+	
+	S=$(find ${SRC_DIR}/. -maxdepth 3 -iname *.csproj)
 	printf 'Found %s csproj files\n' $(echo "$PROJECT_FILES" | wc -l | tr -d ' ')
 	PROJECT_FILE=$(echo "$PROJECT_FILES" | head -1)
 fi
