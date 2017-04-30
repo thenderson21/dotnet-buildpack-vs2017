@@ -39,22 +39,6 @@ mkdir -p ${SRC_DIR}
 mkdir -p ${BUILD_DIR}/.profile.d
 mkdir -p ${CACHE_DIR}
 
-# Get libunwind
-# TODO: factor this out into method
-LIBUNWIND_DEB_DIR=${CACHE_DIR}/deb/libunwind/${LIBUNWIND_VERSION}
-if [ ! -f ${LIBUNWIND_DEB_DIR}/libunwind.deb ]; then
-	rm -rf ${CACHE_DIR}/deb/libunwind/* || true
-	mkdir -p ${LIBUNWIND_DEB_DIR}
-
-	echo "Downloading libunwind version ${LIBUNWIND_VERSION}"
-	curl -o ${LIBUNWIND_DEB_DIR}/libunwind.deb -sSL https://mirrors.kernel.org/ubuntu/pool/main/libu/libunwind/libunwind8_${LIBUNWIND_VERSION}_amd64.deb
-fi
-mkdir -p ${BUILD_DIR}/.apt
-dpkg -x ${LIBUNWIND_DEB_DIR}/libunwind.deb $BUILD_DIR/.apt/
-export LD_LIBRARY_PATH="$BUILD_DIR/.apt/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
-cat <<EOF >$BUILD_DIR/.profile.d/000_apt.sh
-export LD_LIBRARY_PATH="\$HOME/.apt/usr/lib/x86_64-linux-gnu:\$LD_LIBRARY_PATH"
-EOF
 
 # Get Dotnet Core
 DOTNET_CACHE_LOCATION=${CACHE_DIR}/dotnet/${DOTNET_SDK_VERSION}
@@ -64,34 +48,9 @@ if [ ! -d ${DOTNET_CACHE_LOCATION} ]; then
 
 	echo "Downloading .NET SDK version ${DOTNET_SDK_VERSION} and runtime version ${DOTNET_RUNTIME_VERSION}"
 
-	DOTNET_SDK_DOWNLOAD_URL=https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$DOTNET_SDK_VERSION/dotnet-dev-ubuntu-x64.$DOTNET_SDK_VERSION.tar.gz
-	curl -sSL ${DOTNET_SDK_DOWNLOAD_URL} | tar xz -C ${DOTNET_CACHE_LOCATION}/sdk
-	find ${DOTNET_CACHE_LOCATION}/sdk/sdk/${DOTNET_SDK_VERSION}/runtimes/* -maxdepth 0 ! -name unix ! -name any -exec rm -r {} +
-	rm -f ${DOTNET_CACHE_LOCATION}/sdk/sdk/${DOTNET_SDK_VERSION}/nuGetPackagesArchive.lzma
-
-	DOTNET_RUNTIME_DOWNLOAD_URL=https://dotnetcli.blob.core.windows.net/dotnet/release/1.1.0/Binaries/$DOTNET_RUNTIME_VERSION/dotnet-ubuntu-x64.$DOTNET_RUNTIME_VERSION.tar.gz
-	curl -sSL ${DOTNET_RUNTIME_DOWNLOAD_URL} | tar xz -C ${DOTNET_CACHE_LOCATION}/runtime
+	curl -sSL https://dot.net/v1/dotnet-install.sh
 fi
-export PATH="${DOTNET_CACHE_LOCATION}/sdk:$PATH"
-cp -r ${DOTNET_CACHE_LOCATION}/runtime ${BUILD_DIR}/dotnet
-cat <<EOF >$BUILD_DIR/.profile.d/000_dotnet.sh
-export PATH="\$HOME/dotnet:\$PATH"
-EOF
 
-# Get Node.js
-NODEJS_CACHE_LOCATION=${CACHE_DIR}/nodejs/${NODEJS_VERSION}
-export PATH="${NODEJS_CACHE_LOCATION}/node-v${NODEJS_VERSION}-linux-x64/bin:$PATH"
-if [ ! -d ${NODEJS_CACHE_LOCATION} ]; then
-	rm -rf ${CACHE_DIR}/nodejs/* || true
-	NODEJS_DOWNLOAD_URL=https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.xz
-
-	mkdir -p ${NODEJS_CACHE_LOCATION}
-
-	echo "Downloading Node.js version ${NODEJS_VERSION}"
-	curl -sSL ${NODEJS_DOWNLOAD_URL} | tar xJ -C ${NODEJS_CACHE_LOCATION}
-	npm install -g grunt-cli bower gulp
-fi
-npm config set cache ${NODEJS_CACHE_LOCATION}/npm/cache -g
 
 # Build the project
 DEPLOYMENT_FILE_LOCATION=${SRC_DIR}/.deployment
