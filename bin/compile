@@ -139,6 +139,6 @@ if [ -e ${SRC_DIR}/Procfile ]; then
 else
 	cat << EOT >> ${BUILD_DIR}/Procfile
 echo "dotnet $PORT"
-web: dotnet ${HOME}/${PROJECT_NAME}.dll http://0.0.0.0:\$PORT
+web: dotnet ${PROJECT_NAME}.dll http://0.0.0.0:\$PORT
 EOT
 fi
