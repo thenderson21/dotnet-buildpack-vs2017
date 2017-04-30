@@ -47,8 +47,9 @@ if [ ! -d ${DOTNET_CACHE_LOCATION} ]; then
 	mkdir -p ${DOTNET_CACHE_LOCATION}/{sdk,runtime}
 
 	echo "Downloading .NET SDK version ${DOTNET_SDK_VERSION} and runtime version ${DOTNET_RUNTIME_VERSION}"
-
-	curl https://dot.net/v1/dotnet-install.sh | bash -sSL -- --install-dir ${DOTNET_CACHE_LOCATION}
+	curl -OSL https://dot.net/v1/dotnet-install.sh
+	chmod +x dotnet-install.sh 
+	./dotnet-install.sh --install-dir ${DOTNET_CACHE_LOCATION}
 fi
 
 
