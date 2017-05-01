@@ -20,8 +20,6 @@ export_env_dir ${ENV_DIR}
 
 : ${LIBUV_VERSION:="1.11.0"}
 : ${NODEJS_VERSION:="6.9.5"}
-: ${DOTNET_SDK_VERSION:="1.0.0-rc4-004771"}
-: ${DOTNET_RUNTIME_VERSION:="1.1.0"}
 : ${LIBUNWIND_VERSION:="1.1-4.1"}
 
 export NUGET_XMLDOC_MODE=skip
@@ -41,18 +39,18 @@ mkdir -p ${CACHE_DIR}
 
 
 # Get Dotnet Core
-DOTNET_CACHE_LOCATION=${CACHE_DIR}/dotnet/${DOTNET_SDK_VERSION}
+DOTNET_CACHE_LOCATION=${CACHE_DIR}/dotnet/
 if [ ! -d ${DOTNET_CACHE_LOCATION} ]; then
 	rm -rf ${CACHE_DIR}/dotnet/* || true
 	mkdir -p ${DOTNET_CACHE_LOCATION}/{sdk,runtime}
 
-	echo "Downloading .NET SDK version ${DOTNET_SDK_VERSION} and runtime version ${DOTNET_RUNTIME_VERSION}"
+	echo "Downloading .NET SDK and runtime}"
 	curl -OSL https://dot.net/v1/dotnet-install.sh
 	chmod +x dotnet-install.sh 
 	./dotnet-install.sh --install-dir ${DOTNET_CACHE_LOCATION}
 fi
 export PATH="${DOTNET_CACHE_LOCATION}/sdk:$PATH"
-cp -r ${DOTNET_CACHE_LOCATION}/dotnet ${BUILD_DIR}/dotnet
+cp  ${DOTNET_CACHE_LOCATION}/dotnet ${BUILD_DIR}/dotnet
 cat <<EOF >$BUILD_DIR/.profile.d/000_dotnet.sh
 export PATH="\$HOME/dotnet:\$PATH"
 EOF
