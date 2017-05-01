@@ -51,6 +51,11 @@ if [ ! -d ${DOTNET_CACHE_LOCATION} ]; then
 	chmod +x dotnet-install.sh 
 	./dotnet-install.sh --install-dir ${DOTNET_CACHE_LOCATION}
 fi
+export PATH="${DOTNET_CACHE_LOCATION}/sdk:$PATH"
+cp -r ${DOTNET_CACHE_LOCATION}/dotnet ${BUILD_DIR}/dotnet
+cat <<EOF >$BUILD_DIR/.profile.d/000_dotnet.sh
+export PATH="\$HOME/dotnet:\$PATH"
+EOF
 
 
 # Build the project
